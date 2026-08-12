@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贈送圖書識別與一頁式展示目錄 | Book Recognition Catalog</title>
+    <meta name="description" content="69 本精選贈送圖書之影像辨識、智慧裁切與線上介紹目錄。">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-sans: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Dark Theme Colors */
+            --bg-body: #0b0f19;
+            --bg-card: rgba(22, 30, 49, 0.75);
+            --bg-card-hover: rgba(30, 41, 67, 0.85);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-card-hover: rgba(99, 102, 241, 0.4);
+            
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.15);
+            --accent: #ec4899;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            
+            --glass-bg: rgba(17, 24, 39, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 20px 40px -15px rgba(99, 102, 241, 0.3);
+            
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-hover: #ffffff;
+            --border-card: rgba(0, 0, 0, 0.06);
+            --border-card-hover: rgba(99, 102, 241, 0.5);
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-dim: #94a3b8;
+            
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 35px -10px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.06) 0%, transparent 40%);
+            background-attachment: fixed;
+            transition: background-color 0.4s ease;
+        }
+
+        /* Navbar & Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .brand-text h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .badge-count {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid var(--border-card-hover);
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .theme-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-btn:hover {
+            transform: rotate(15deg) scale(1.05);
+            border-color: var(--primary);
+        }
+
+        /* Hero Banner */
+        .hero {
+            max-width: 1400px;
+            margin: 2.5rem auto 1.5rem auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+        }
+
+        /* Search & Filter Controls */
+        .controls-section {
+            max-width: 1400px;
+            margin: 0 auto 2.5rem auto;
+            padding: 0 2rem;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            max-width: 650px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 54px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 99px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light), var(--shadow-hover);
+        }
+
+        /* Category Filter Pills */
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-pill {
+            padding: 8px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 99px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .filter-pill:hover {
+            color: var(--text-main);
+            border-color: var(--border-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .filter-pill.active {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Stats Bar */
+        .stats-summary {
+            max-width: 1400px;
+            margin: 0 auto 1.5rem auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Books Grid */
+        .books-grid {
+            max-width: 1400px;
+            margin: 0 auto 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Book Card */
+        .book-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-card-hover);
+            box-shadow: var(--shadow-hover);
+            background: var(--bg-card-hover);
+        }
+
+        .cover-container {
+            width: 100%;
+            height: 320px;
+            background: rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .cover-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease;
+        }
+
+        .book-card:hover .cover-image {
+            transform: scale(1.05);
+        }
+
+        .category-tag {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .book-id-badge {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .book-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.3;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-subtitle {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-meta {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .book-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-card);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Modal Dialog */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: var(--bg-body);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal-cover-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+        }
+
+        .modal-cover-wrap img {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-category {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            align-self: flex-start;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .modal-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .modal-details-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .modal-details-table td:first-child {
+            color: var(--text-dim);
+            width: 90px;
+            font-weight: 600;
+        }
+
+        .modal-desc-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal-desc-text {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            color: var(--text-dim);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-card);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.88rem;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 850px) {
+            .modal-container {
+                grid-template-columns: 1fr;
+                max-height: 95vh;
+            }
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <div class="brand-icon">書</div>
+                <div class="brand-text">
+                    <h1>贈送圖書目錄與識別成果</h1>
+                    <p>Book Recognition & Static Catalog</p>
+                </div>
+            </a>
+            <div class="header-actions">
+                <span class="badge-count" id="total-badge">共 69 本圖書</span>
+                <button class="theme-btn" id="theme-toggle" title="切換深色/淺色主題">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Header -->
+    <section class="hero">
+        <h2>精選圖書典藏與線上簡介目錄</h2>
+        <p>全數圖書經由 AI 影像識別、邊緣智慧裁切與線上資料庫交叉檢索，提供清晰封面、詳盡簡介與一鍵線上書籍介紹連結。</p>
+    </section>
+
+    <!-- Controls & Search -->
+    <section class="controls-section">
+        <div class="search-box-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="輸入書名、作者、出版社或關鍵字搜尋..." autocomplete="off">
+        </div>
+
+        <div class="category-filters" id="category-filters">
+            <!-- Dynamic Category Pills -->
+        </div>
+    </section>
+
+    <!-- Stats Summary -->
+    <div class="stats-summary">
+        <span id="showing-count">顯示 69 本圖書</span>
+        <span id="active-filter-label">目前分類：全部圖書</span>
+    </div>
+
+    <!-- Books Grid -->
+    <main class="books-grid" id="books-grid">
+        <!-- Dynamic Book Cards -->
+    </main>
+
+    <!-- Modal Popup for Book Details -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-container">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-cover-wrap">
+                <img src="" id="modal-img" alt="Book Cover">
+            </div>
+            <div class="modal-info">
+                <span class="modal-category" id="modal-category">分類</span>
+                <h2 class="modal-title" id="modal-title">書名</h2>
+                <div class="modal-subtitle" id="modal-subtitle">副標題</div>
+                
+                <table class="modal-details-table">
+                    <tr>
+                        <td>作者：</td>
+                        <td id="modal-author">-</td>
+                    </tr>
+                    <tr>
+                        <td>出版社：</td>
+                        <td id="modal-publisher">-</td>
+                    </tr>
+                    <tr>
+                        <td>圖檔檔名：</td>
+                        <td id="modal-filename">-</td>
+                    </tr>
+                </table>
+
+                <div class="modal-desc-title">內容簡介</div>
+                <div class="modal-desc-text" id="modal-desc">簡介內容...</div>
+
+                <a href="#" target="_blank" rel="noopener" class="btn btn-primary" id="modal-url-btn">
+                    🌐 前往線上書籍介紹 / 搜尋
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 贈送圖書自動識別系統 | 智慧裁切 & 靜態網頁展覽器</p>
+    </footer>
+
+    <!-- Inline Data for Standalone Instant Execution -->
+    <script>
+        // Embedded Books Data (Fallback for direct file:// access without CORS issues)
+        const EMBEDDED_BOOKS_DATA = [
+  {
+    "id": 1,
+    "filename": "IMG_6824.jpg",
+    "title": "學生數學辭典",
+    "subtitle": "彩色插圖圖解",
+    "author": "鐘文",
+    "publisher": "鐘文出版社",
+    "category": "工具書/字典",
+    "description": "針對小學及初中學生數學科最佳輔助教材，全彩插圖與範例圖解，彙整基礎幾何、代數公式與九九乘法表教學法。",
+    "image": "processed_images/IMG_6824.jpg",
+    "url": "https://www.google.com/search?q=%E5%AD%B8%E7%94%9F%E6%95%B8%E5%AD%B8%E9%90%B5%E5%85%B8%20%E9%90%B5%E6%96%87"
+  },
+  {
+    "id": 2,
+    "filename": "IMG_6825.jpg",
+    "title": "學生數學辭典 (精裝版)",
+    "subtitle": "教育部國立編譯館優良圖書獎",
+    "author": "鐘文",
+    "publisher": "鐘文出版社",
+    "category": "工具書/字典",
+    "description": "榮獲教育部國立編譯館優良圖書獎，圖文並茂解說數學邏輯概念、運算技巧與例題剖析。",
+    "image": "processed_images/IMG_6825.jpg",
+    "url": "https://www.google.com/search?q=%E5%AD%B8%E7%94%9F%E6%95%B8%E5%AD%B8%E9%90%B5%E5%85%B8%20(%E7%B2%BE%E8%A3%9D%E7%89%88)%20%E9%90%B5%E6%96%87"
+  },
+  {
+    "id": 3,
+    "filename": "IMG_6826.jpg",
+    "title": "學生成語辭典",
+    "subtitle": "彩色插圖圖解",
+    "author": "鄭振耀、盧虹諭",
+    "publisher": "鐘文出版社",
+    "category": "工具書/字典",
+    "description": "蒐集一千七百個常用成語，詳細解釋字義、出處典故、相反詞與相似詞，採無毒環保油墨印刷。",
+    "image": "processed_images/IMG_6826.jpg",
+    "url": "https://www.google.com/search?q=%E5%AD%B8%E7%94%9F%E6%88%90%E8%AA%9E%E9%90%B5%E5%85%B8%20%E9%84%AD%E振%E8%80%80%E3%80%81%E7%9B%A7%E4%B9%96%E8%AB%AD"
+  },
+  {
+    "id": 4,
+    "filename": "IMG_6827.jpg",
+    "title": "學生字音錯別字辭典",
+    "subtitle": "彩色插圖圖解",
+    "author": "鐘文",
+    "publisher": "鐘文出版社",
+    "category": "工具書/字典",
+    "description": "精選學生最需要的多音字與易錯別字，附詳細註解、例句與生活活用，不再寫錯字、念錯音。",
+    "image": "processed_images/IMG_6827.jpg",
+    "url": "https://www.google.com/search?q=%E5%AD%B8%E7%94%9F%E5%AD%97%E9%9F%B3%E9%8C%AF%E5%88%A5%E5%AD%97%E9%90%B5%E5%85%B8%20%E9%90%B5%E6%96%87"
+  },
+  {
+    "id": 5,
+    "filename": "IMG_6828.jpg",
+    "title": "自然科學小百科",
+    "subtitle": "彩色漫畫圖解",
+    "author": "鐘文編輯部",
+    "publisher": "鐘文出版社",
+    "category": "科普知識",
+    "description": "榮獲教育部優良圖書獎，透過活潑全彩漫畫故事普及物理、化學、生物與自然生態科學知識。",
+    "image": "processed_images/IMG_6828.jpg",
+    "url": "https://www.google.com/search?q=%E8%87%AA%E7%84%B6%E7%A7%91%E5%AD%B8%E5%B0%8F%E7%99%BE%E7%A7%91%20%E9%90%B5%E6%96%87%E7%B7%A8%E8%BC%AF%E9%83%A8"
+  },
+  {
+    "id": 6,
+    "filename": "IMG_6829.jpg",
+    "title": "畫個圖講得更清楚",
+    "subtitle": "Visual Meetings (視覺化會議與團隊溝通指南)",
+    "author": "大衛・斯貝特 (David Sibbet)",
+    "publisher": "時報出版",
+    "category": "生活實用",
+    "description": "介紹如何運用視覺化圖解、心智圖與會議白板繪圖，大幅提升團隊溝通效率與創意激盪。",
+    "image": "processed_images/IMG_6829.jpg",
+    "url": "https://www.google.com/search?q=%E7%95%AB%E5%80%8B%E5%9C%96%E8%AC%9B%E5%BE%97%E6%9B%B4%E6%B8%85%E6%A5%9A%20%E5%A4%A7%E8%A1%9B%E3%80%8B%E6%96%AF%E8%B2%9D%E7%89%B9"
+  },
+  {
+    "id": 7,
+    "filename": "IMG_6830.jpg",
+    "title": "程式設計範式與OOP的思考術",
+    "subtitle": "冒號老師的十三堂課",
+    "author": "鄭暉",
+    "publisher": "博碩文化",
+    "category": "工具書/電腦資訊",
+    "description": "貫通物件導向 (OOP)、函數式程式設計與多種編程範式，以生動對話引導程式架構思維與底層原理。",
+    "image": "processed_images/IMG_6830.jpg",
+    "url": "https://www.google.com/search?q=%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%E7%AF%84%E5%BC%8F%E8%88%87OOP%E7%9A%84%E6%80%9D%E8%80%83%E8%A1%93%20%E9%84%AD%E6%9A%8B"
+  },
+  {
+    "id": 8,
+    "filename": "IMG_6831.jpg",
+    "title": "SCRUM敏捷產品管理",
+    "subtitle": "打造客戶喜愛的產品",
+    "author": "Roman Pichler",
+    "publisher": "博碩文化",
+    "category": "商業理財/專案管理",
+    "description": "經典 Scrum Product Owner 實戰手冊，教你如何規劃 Product Backlog、掌握用戶需求與敏捷迭代發布。",
+    "image": "processed_images/IMG_6831.jpg",
+    "url": "https://www.google.com/search?q=SCRUM%E6%95%8F%E6%8D%B7%E7%94%A2%E5%93%81%E7%AE%A1%E7%90%86%20Roman%20Pichler"
+  },
+  {
+    "id": 9,
+    "filename": "IMG_6832.jpg",
+    "title": "這樣下指令，軟爛部屬變能幹",
+    "subtitle": "行為科學管理實務",
+    "author": "石田淳",
+    "publisher": "大是文化",
+    "category": "商業理財/管理",
+    "description": "日本行為科學管理大師石田淳親授，不談空洞口號，從可執行的「行為分解」與「目標分解」帶領部屬成長。",
+    "image": "processed_images/IMG_6832.jpg",
+    "url": "https://www.google.com/search?q=%E9%80%99%E6%A5%AD%E4%B8%8B%E6%8C%87%E4%BB%A4%EF%BC%8C%E8%BB%AF%E7%88%9B%E9%83%A8%E5%B1%AC%E8%AE%8A%E8%83%BD%E5%B9%B9%20%E7%9F%B3%E7%94%B0%E6%B7%B3"
+  },
+  {
+    "id": 10,
+    "filename": "IMG_6833.jpg",
+    "title": "Borland/Turbo C++語言實務",
+    "subtitle": "C/C++ 經典程式設計",
+    "author": "施威銘研究室",
+    "publisher": "旗標資訊",
+    "category": "工具書/電腦資訊",
+    "description": "台灣 C/C++ 經典教學專書，由淺入深解說語法結構、記憶體指標、指標陣列與檔案處理。",
+    "image": "processed_images/IMG_6833.jpg",
+    "url": "https://www.google.com/search?q=Borland/Turbo%20C%2B%2B%E8%AA%9E%E8%A8%80%E5%AF%A6%E5%8B%99%20%E6%96%BD%E5%A8%81%E9%8A%9D%E7%A0%94%E7%A9%B6%E5%AE%A4"
+  },
+  {
+    "id": 11,
+    "filename": "IMG_6834.jpg",
+    "title": "AutoLISP & DCL 基礎篇",
+    "subtitle": "AutoCAD 程式設計魔法書",
+    "author": "吳永進、林美櫻",
+    "publisher": "知城數位",
+    "category": "工具書/電腦資訊",
+    "description": "AutoCAD 自動化設計權威著作，輕鬆掌握 AutoLISP 語法與 DCL 對話框元件開發技巧。",
+    "image": "processed_images/IMG_6834.jpg",
+    "url": "https://www.google.com/search?q=AutoLISP%20%26%20DCL%20%E5%9F%BA%E7%A4 me%E7%AF%87%20%E5%90%B3%E永%E9%80%B2%E3%80%81%E6%9E%97%E7%BE%8E%E6%AB%BB"
+  },
+  {
+    "id": 12,
+    "filename": "IMG_6835.jpg",
+    "title": "1小時做完1天工作，亞馬遜怎麼辦到的？",
+    "subtitle": "亞馬遜創始主管公開內部超效工作法",
+    "author": "佐藤將之",
+    "publisher": "先覺出版",
+    "category": "商業理財/管理",
+    "description": "Amazon 創始期高階主管實戰分享，公開數字管理、會議縮減與問題秒速解決的超狂工作哲學。",
+    "image": "processed_images/IMG_6835.jpg",
+    "url": "https://www.google.com/search?q=1%E5%B0%8F%E6%99%82%E5%81%9A%E5%AE%8C1%E5%A4%A9%E5%B7%A5%E4%BD%9C%E4%BA%9E%E9%A6%AC%E9%81%9C%20%E4%BD%90%E8%97%A4%E5%B0%87%E4%B9%8B"
+  },
+  {
+    "id": 13,
+    "filename": "IMG_6836.jpg",
+    "title": "再忙也不會出錯的完美工作執行力",
+    "subtitle": "讓錯誤不再重複出現的終極絕招！",
+    "author": "鳥原隆志",
+    "publisher": "樂金文化",
+    "category": "商業理財/管理",
+    "description": "拆解職場工作中的常犯失誤與疏漏，運用檢核清單與 SOP 機制實現零失誤的高品質產出。",
+    "image": "processed_images/IMG_6836.jpg",
+    "url": "https://www.google.com/search?q=%E5%86%8D%E5%BF%99%E4%B9%9F%E4%B8%8D%E6%9C%83%E5%87%BA%E9%8C%AF%E7%9A%84%E5%AE%8C%E7%BE%8E%E5%B7%A5%E4%BD%9C%E5%9F%B7%E8%A1%8C%E5%8A%9B%20%E9%B3%A5%E5%8E%9F%E9%9A%86%E5%BF%97"
+  },
+  {
+    "id": 14,
+    "filename": "IMG_6837.jpg",
+    "title": "UML團隊開發流程與管理",
+    "subtitle": "系統分析師 SA 必備指南",
+    "author": "賴信仁 (HSDC顧問團隊)",
+    "publisher": "悅知文化",
+    "category": "工具書/電腦資訊",
+    "description": "軟體系統分析與設計必備手冊，實務演練 Use Case、類別圖、順序圖與團隊開發合流管理。",
+    "image": "processed_images/IMG_6837.jpg",
+    "url": "https://www.google.com/search?q=UML%E5%9C%98%E9%9A%8A%E9%96%8B%E7%99%BC%E6%B5%81%E7%A8%8B%E8%88%87%E7%AE%A1%E7%90%86%20%E8%B3%B4%E4%BF%A1%E4%BB%81"
+  },
+  {
+    "id": 15,
+    "filename": "IMG_6838.jpg",
+    "title": "Java程式設計師的職場進化之路",
+    "subtitle": "IT職場菜鳥的學習成長關鍵心法",
+    "author": "吳亞峰",
+    "publisher": "博碩文化",
+    "category": "工具書/電腦資訊",
+    "description": "專為 Java 開發者打造的職涯成長專書，涵蓋 JVM 優化、設計模式實踐與大型專案架構思維。",
+    "image": "processed_images/IMG_6838.jpg",
+    "url": "https://www.google.com/search?q=Java%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%E5%B8%AB%E7%9A%84%E8%81%B7%E5%A0%B4%E9%80%B2%E5%8C%96%E4%B9%8B%E8%B7%AF%20%E5%90%B3%E4%BA%9E%E5%B3%B0"
+  },
+  {
+    "id": 16,
+    "filename": "IMG_6839.jpg",
+    "title": "C++程式設計",
+    "subtitle": "個體導向思維模式與 C++ 實作",
+    "author": "林明政",
+    "publisher": "財團法人資訊工業策進會",
+    "category": "工具書/電腦資訊",
+    "description": "資策會精選教材，紮實解析 C++ 類別繼承、多型、封裝與物件導向軟體工程架構。",
+    "image": "processed_images/IMG_6839.jpg",
+    "url": "https://www.google.com/search?q=C%2B%2B%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%20%E6%9E%97%E6%98%8E%E6%94%BF"
+  },
+  {
+    "id": 17,
+    "filename": "IMG_6840.jpg",
+    "title": "C:程式設計藝術",
+    "subtitle": "C: How to Program (2nd Edition)",
+    "author": "H.M. Deitel, P.J. Deitel",
+    "publisher": "全華圖書",
+    "category": "工具書/電腦資訊",
+    "description": "全球無數大專院校指定 C 語言經典教科書，全方位講授程式邏輯、指標與資料結構。",
+    "image": "processed_images/IMG_6840.jpg",
+    "url": "https://www.google.com/search?q=C%3A%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%E8%97%9D%E8%A1%93%20H.M.%20Deitel"
+  },
+  {
+    "id": 18,
+    "filename": "IMG_6841.jpg",
+    "title": "台灣蛇毒傳奇",
+    "subtitle": "台灣科學史上輝煌的一頁",
+    "author": "楊玉齡、羅時成",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "記錄台灣生醫研究先驅如何將致命蛇毒化為拯救萬人的醫療聖藥，呈現台灣頂尖科學家的生動故事。",
+    "image": "processed_images/IMG_6841.jpg",
+    "url": "https://www.google.com/search?q=%E5%8F%B0%E7%81%A3%E8%9B%87%E6%AF%92%E5%82%B3%E5%A5%87%20%E6%A5%AD%E7%8E%89%E9%BD%A1"
+  },
+  {
+    "id": 19,
+    "filename": "IMG_6842.jpg",
+    "title": "惡血",
+    "subtitle": "矽谷獨角獸的醫療騙局！深藏血液裡的祕密、謊言與金錢",
+    "author": "John Carreyrou (約翰・凱瑞魯)",
+    "publisher": "商業周刊",
+    "category": "商業理財/報導文學",
+    "description": "퓰리처상 獲獎記者深入調查 Theranos 世紀巨詐，揭露矽谷新創騙局與龐氏風暴的震撼報導。",
+    "image": "processed_images/IMG_6842.jpg",
+    "url": "https://www.google.com/search?q=%E6%83%A1%E8%A1%80%20John%20Carreyrou"
+  },
+  {
+    "id": 20,
+    "filename": "IMG_6843.jpg",
+    "title": "大小雞婆",
+    "subtitle": "小野溫馨幽默散文集",
+    "author": "小野",
+    "publisher": "皇冠文化",
+    "category": "文學故事/散文",
+    "description": "知名作家小野以細膩風趣的筆觸記錄家庭日常生活瑣事與親子之間的溫馨對話。",
+    "image": "processed_images/IMG_6843.jpg",
+    "url": "https://www.google.com/search?q=%E5%A4%A7%E5%B0%8F%E9%9B%9E%E5%A9%86%20%E5%B0%8F%E9%87%8E"
+  },
+  {
+    "id": 21,
+    "filename": "IMG_6844.jpg",
+    "title": "野孩子",
+    "subtitle": "少年成長經典小說",
+    "author": "大頭春",
+    "publisher": "聯合文學",
+    "category": "文學故事/小說",
+    "description": "以張大春化名大頭春所撰寫的成長題材作品，反映少年青春期的叛逆、困惑與熱血幻想。",
+    "image": "processed_images/IMG_6844.jpg",
+    "url": "https://www.google.com/search?q=%E9%87%8E%E5%AD%A9%E5%AD%90%20%E5%A4%A7%E9%A0%AD%E6%98%A5"
+  },
+  {
+    "id": 22,
+    "filename": "IMG_6845.jpg",
+    "title": "正規式速查手冊",
+    "subtitle": "Regular Expression Pocket Reference",
+    "author": "Tony Stubblebine",
+    "publisher": "O'Reilly (歐萊禮)",
+    "category": "工具書/電腦資訊",
+    "description": "工程師口袋必備工具書，快速查閱 Perl、Python、JavaScript 與 PCRE 的正規表示式語法。",
+    "image": "processed_images/IMG_6845.jpg",
+    "url": "https://www.google.com/search?q=%E6%AD%A3%E8%A6%8F%E5%BC%8F%E9%80%9F%E查%E6%89%8B%E5%86%8A%20Tony%20Stubblebine"
+  },
+  {
+    "id": 23,
+    "filename": "IMG_6846.jpg",
+    "title": "原諒石",
+    "subtitle": "唯有和過去和解，才能迎向未來",
+    "author": "Lori Nelson Spielman (羅莉·奈爾森·史皮曼)",
+    "publisher": "寂寞出版",
+    "category": "文學故事",
+    "description": "《生命清單》作者又一暖心力作，述說一顆傳遞原諒與和解的石頭，如何化解宿怨並找回自我。",
+    "image": "processed_images/IMG_6846.jpg",
+    "url": "https://www.google.com/search?q=%E5%8E%9F%E8%AB%92%E7%9F%B3%20Lori%20Nelson%20Spielman"
+  },
+  {
+    "id": 24,
+    "filename": "IMG_6847.jpg",
+    "title": "達爾文大震撼",
+    "subtitle": "聽聽古爾德怎麼說",
+    "author": "Stephen Jay Gould (古爾德)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "當代古生物學大師古爾德經典論著，重新審視達爾文演化論，探討生命史上的偶發事件與飛躍跳躍。",
+    "image": "processed_images/IMG_6847.jpg",
+    "url": "https://www.google.com/search?q=%E9%81%94%E7%88%BE%E6%96%87%E5%A4%A7%E9%9C%87%E6%86%BE%20Stephen%20Jay%20Gould"
+  },
+  {
+    "id": 25,
+    "filename": "IMG_6848.jpg",
+    "title": "快思慢想",
+    "subtitle": "Thinking, Fast and Slow",
+    "author": "Daniel Kahneman (丹尼爾·康納曼)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "諾貝爾經濟學獎得主康納曼鋸作，剖析大腦「直覺系統一」與「理性系統二」的運作機制與思考偏誤。",
+    "image": "processed_images/IMG_6848.jpg",
+    "url": "https://www.google.com/search?q=%E5%BF%AB%E6%80%9D%E6%85%A2%E6%83%B3%20Daniel%20Kahneman"
+  },
+  {
+    "id": 26,
+    "filename": "IMG_6849.jpg",
+    "title": "深入淺出 HTML5 程式設計",
+    "subtitle": "Head First HTML5 Programming",
+    "author": "Eric Freeman, Elisabeth Robson",
+    "publisher": "O'Reilly / 碁峰資訊",
+    "category": "工具書/電腦資訊",
+    "description": "圖解豐富、易學易懂的 Web 開發學習指南，結合 HTML5 API, Canvas, Geolocation 與 JavaScript。",
+    "image": "processed_images/IMG_6849.jpg",
+    "url": "https://www.google.com/search?q=%E6%B7%B1%E5%85%A5%E6%B7%BA%E5%87%BA%20HTML5%20%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%20Eric%20Freeman"
+  },
+  {
+    "id": 27,
+    "filename": "IMG_6850.jpg",
+    "title": "學徒模式",
+    "subtitle": "優秀軟體開發者的養成之路 (Apprenticeship Patterns)",
+    "author": "Dave H. Hoover, Adewale Oshineye",
+    "publisher": "O'Reilly / 碁峰資訊",
+    "category": "工具書/電腦資訊",
+    "description": "專為程式員打造的職涯成長聖經，傳授軟體工程師如何建立持續學習心態與克服技術瓶頸。",
+    "image": "processed_images/IMG_6850.jpg",
+    "url": "https://www.google.com/search?q=%E5%AD%B8%E5%BE%92%E6%A8%A1%E5%BC%8F%20Dave%20H.%20Hoover"
+  },
+  {
+    "id": 28,
+    "filename": "IMG_6851.jpg",
+    "title": "零度分離",
+    "subtitle": "Zero Degrees of Separation",
+    "author": "伊格言",
+    "publisher": "麥田出版",
+    "category": "文學故事",
+    "description": "台灣著名作家伊格言跨界小說，融合科技思潮與詩意敘事，探討當代社會孤獨與人際連結。",
+    "image": "processed_images/IMG_6851.jpg",
+    "url": "https://www.google.com/search?q=%E9%9B%B6%E5%BA%A6%E5%88%86%E9%9B%A2%20%E4%BC%8A%E6%A0%BC%E8%A8%80"
+  },
+  {
+    "id": 29,
+    "filename": "IMG_6852.jpg",
+    "title": "醫者誓言",
+    "subtitle": "一位護理者的心靈奇蹟之旅",
+    "author": "蘇逸玲 (採訪撰文: 陳本瑜)",
+    "publisher": "發光體出版",
+    "category": "生活實用",
+    "description": "資深護理師第一線的生死記錄與奉獻歷程，溫暖感人，深刻展現醫療照護者的慈悲大愛。",
+    "image": "processed_images/IMG_6852.jpg",
+    "url": "https://www.google.com/search?q=%E9%86%AB%E8%80%85%E8%AA%93%E8%A8%80%20%E8%98%87%E9%80%B8%E7%8E%B2"
+  },
+  {
+    "id": 30,
+    "filename": "IMG_6853.jpg",
+    "title": "異軍 (倪匡科幻系列)",
+    "subtitle": "衛斯理科幻冒險傳奇",
+    "author": "倪匡",
+    "publisher": "風雲時代",
+    "category": "文學故事",
+    "description": "華文科幻大師倪匡經典傳奇，展開刺激神秘的外星生命探險與人類文明反思。",
+    "image": "processed_images/IMG_6853.jpg",
+    "url": "https://www.google.com/search?q=%E7%95%B0%E8%BB%8D%20%E5%80%AA%E匡"
+  },
+  {
+    "id": 31,
+    "filename": "IMG_6854.jpg",
+    "title": "甩掉尾巴的小美人魚",
+    "subtitle": "顛覆童話 3 (Whatever After)",
+    "author": "Sarah Mlynowski (莎拉·梅林諾斯基)",
+    "publisher": "東雨文化",
+    "category": "童書繪本",
+    "description": "紐約時報暢銷兒童童話改編系列，穿梭魔法鏡子改寫經典小美人魚故事的歡樂冒險。",
+    "image": "processed_images/IMG_6854.jpg",
+    "url": "https://www.google.com/search?q=%E7%94%A9%E6%8E%89%E5%B0%BE%E5%B7%B4%E7%9A%84%E5%B0%8F%E7%BE%8E%E4%BA%BA%E9%AD%9A%20Sarah%20Mlynowski"
+  },
+  {
+    "id": 32,
+    "filename": "IMG_6855.jpg",
+    "title": "租來的人生",
+    "subtitle": "在記憶裡，我們的故事是一段租來的愛情...",
+    "author": "吳淡如",
+    "publisher": "時報出版",
+    "category": "文學故事",
+    "description": "暢銷作家吳淡如經典情感小說，描繪當代都市男女情感糾葛與人生選擇的深刻體驗。",
+    "image": "processed_images/IMG_6855.jpg",
+    "url": "https://www.google.com/search?q=%E7%A5%96%E4%BE%86%E7%9A%84%E4%BA%BA%E7%94%9F%20%E5%90%B3%E6%B7%A1%E5%A6%82"
+  },
+  {
+    "id": 33,
+    "filename": "IMG_6856.jpg",
+    "title": "貓戰士 三力量 3：驅逐之戰",
+    "subtitle": "Warriors: Outcast",
+    "author": "Erin Hunter (艾琳·杭特)",
+    "publisher": "晨星出版",
+    "category": "文學故事",
+    "description": "風靡全球的貓戰士奇幻冒險大作，講述急水部落面臨外敵威脅，野貓戰士深入急流山脈的英勇對決。",
+    "image": "processed_images/IMG_6856.jpg",
+    "url": "https://www.google.com/search?q=%E8%B2%93%E9%84%AD%E5%A3%AB%20%E9%A5%85%E8%BF%BD%E4%B9%8B%E6%88%B0%20Erin%20Hunter"
+  },
+  {
+    "id": 34,
+    "filename": "IMG_6857.jpg",
+    "title": "蛋黃哥來了 2",
+    "subtitle": "懶懶der~ 療癒系圖文集",
+    "author": "Amy",
+    "publisher": "台灣東販",
+    "category": "生活實用",
+    "description": "Sanrio 超人氣角色蛋黃哥全彩四格漫畫與慵懶金句，輕鬆紓壓解悶的日常必備繪本。",
+    "image": "processed_images/IMG_6857.jpg",
+    "url": "https://www.google.com/search?q=%E8%9B%8B%E9%BB%84%E5%93%A5%E4%BE%86%E4%BA%86%202%20Amy"
+  },
+  {
+    "id": 35,
+    "filename": "IMG_6858.jpg",
+    "title": "放大空間裝修事件書",
+    "subtitle": "解放居家線條、搶出寬敞空間感",
+    "author": "漂亮家居編輯部",
+    "publisher": "麥浩斯",
+    "category": "生活實用",
+    "description": "室內設計權威團隊打造，彙整三大風格空間放大範例，提供小坪數住宅視覺與收納升級全攻略。",
+    "image": "processed_images/IMG_6858.jpg",
+    "url": "https://www.google.com/search?q=%E6%94%BE%E5%A4%A7%E7%A9%BA%E9%96%93%E8%A3%9D%E4%BF%AE%E4%BA%8B%E4%BB%B6%E6%9B%B8%20%E6%BC%82%E4%BA%AE%E5%AE%B6%E居"
+  },
+  {
+    "id": 36,
+    "filename": "IMG_6859.jpg",
+    "title": "第一次投資就上手",
+    "subtitle": "Investing for Beginners (easy money 1)",
+    "author": "易博士編輯部",
+    "publisher": "易博士文化",
+    "category": "生活實用",
+    "description": "個人理財入門圖解專書，一步步帶你了解股票、基金、債券與風險控管基礎觀念。",
+    "image": "processed_images/IMG_6859.jpg",
+    "url": "https://www.google.com/search?q=%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8A%95%E8%B3%87%E5%B0%B1%E4%B8%8A%E6%89%8B%20%E6%98%93%E5%8D%9A%E5%A3%AB"
+  },
+  {
+    "id": 37,
+    "filename": "IMG_6860.jpg",
+    "title": "第一次買股票就上手",
+    "subtitle": "Stocks for Beginners (easy money 2)",
+    "author": "易博士編輯部",
+    "publisher": "易博士文化",
+    "category": "生活實用",
+    "description": "股市新手零失敗入門工具書，圖解開戶流程、看懂K線圖、基本面與技術面分析。",
+    "image": "processed_images/IMG_6860.jpg",
+    "url": "https://www.google.com/search?q=%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%B2%B7%E8%82%A1%E7%A5%A8%E5%B0%B1%E4%B8%8A%E6%89%8B%20%E6%98%93%E5%8D%9A%E5%A3%AB"
+  },
+  {
+    "id": 38,
+    "filename": "IMG_6861.jpg",
+    "title": "圖解第一次投資台指選擇權就上手",
+    "subtitle": "Index option for Beginners (最新修訂版)",
+    "author": "成戈",
+    "publisher": "易博士文化",
+    "category": "生活實用",
+    "description": "詳細解析台指選擇權買賣方策略、勒贖組合與避險操作，適合金融衍生商品初學者。",
+    "image": "processed_images/IMG_6861.jpg",
+    "url": "https://www.google.com/search?q=%E5%9C%96%E8%A7%A3%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%8A%95%E8%B3%87%E5%8F%B0%E6%8C%87%E9%81%B8%E6%93%97%E6%AC%8A%E5%B0%B1%E4%B8%8A%E6%89%8B%20%E6%88%90%E6%88%88"
+  },
+  {
+    "id": 39,
+    "filename": "IMG_6862.jpg",
+    "title": "有效商用文書",
+    "subtitle": "Business Writing (職場成功系列)",
+    "author": "Midge Gillies (蜜吉·吉利斯)",
+    "publisher": "智庫文化",
+    "category": "工具書/字典",
+    "description": "傳授精準商業書信、E-mail 撰寫、企劃案報告技巧，快速打造高效專業的職場形象。",
+    "image": "processed_images/IMG_6862.jpg",
+    "url": "https://www.google.com/search?q=%E6%9C%89%E6%95%88%E5%95%86%E7%94%A8%E6%96%87%E6%9B%B8%20Midge%20Gillies"
+  },
+  {
+    "id": 40,
+    "filename": "IMG_6863.jpg",
+    "title": "有效報告",
+    "subtitle": "Perfect Presentations (職場成功系列)",
+    "author": "John Collins (約翰·柯林斯)",
+    "publisher": "智庫文化",
+    "category": "工具書/字典",
+    "description": "簡報大師教你如何克服演講緊張、設計邏輯簡報投影片，自信征服聽眾與主管。",
+    "image": "processed_images/IMG_6863.jpg",
+    "url": "https://www.google.com/search?q=%E6%9C%89%E6%95%88%E5%A0%B1%E5%91%8A%20John%20Collins"
+  },
+  {
+    "id": 41,
+    "filename": "IMG_6864.jpg",
+    "title": "飆股的長相",
+    "subtitle": "我不看財報 照樣選對股票",
+    "author": "林則行",
+    "publisher": "大是文化",
+    "category": "生活實用",
+    "description": "傳奇基金經理人林則行公開飆股線型圖與突破買點法則，建立高勝率的短中線交易系統。",
+    "image": "processed_images/IMG_6864.jpg",
+    "url": "https://www.google.com/search?q=%E9%A3%99%E8%82%A1%E7%9A%84%E9%95%B7%E7%9B%B8%20%E6%9E%97%E5%89%87%E8%A1%8C"
+  },
+  {
+    "id": 42,
+    "filename": "IMG_6865.jpg",
+    "title": "工作好修行",
+    "subtitle": "聖嚴法師的38則職場智慧",
+    "author": "聖嚴法師",
+    "publisher": "法鼓文化",
+    "category": "生活實用",
+    "description": "聖嚴法師開示職場處世之道，教導如何以禪宗心法化解工作壓力、提昇人際和諧。",
+    "image": "processed_images/IMG_6865.jpg",
+    "url": "https://www.google.com/search?q=%E5%B7%A5%E4%BD%9C%E5%A5%BD%E4%BF%AE%E8%A1%8C%20%E8%81%96%E5%9A%B4%E6%B3%95%E5%B8%AB"
+  },
+  {
+    "id": 43,
+    "filename": "IMG_6866.jpg",
+    "title": "歪理雄辯的說話藝術",
+    "subtitle": "Elocution by Bad Argument",
+    "author": "曾小歌",
+    "publisher": "海鴿文化",
+    "category": "生活實用",
+    "description": "解析邏輯謬誤與說話話術，提昇言語應變力、辯論說服力與防身辨識能力。",
+    "image": "processed_images/IMG_6866.jpg",
+    "url": "https://www.google.com/search?q=%E6%AD%AA%E7%90%86%E9%9B%84%E8%BE%AF%E7%9A%84%E8%AA%AA%E8%A9%B1%E8%97%9D%E8%A1%93%20%E6%9B%BE%E5%B0%8F%E6%AD%8C"
+  },
+  {
+    "id": 44,
+    "filename": "IMG_6867.jpg",
+    "title": "Vision 總裁的14種優質競爭力",
+    "subtitle": "美商宏道資訊亞太及日本區總裁 何經華",
+    "author": "何經華",
+    "publisher": "商周出版",
+    "category": "生活實用",
+    "description": "外企高管何經華分享國際企業管理思維、領導願景與個人卓越競爭力的養成之道。",
+    "image": "processed_images/IMG_6867.jpg",
+    "url": "https://www.google.com/search?q=Vision%20%E7%B8%BD%E8%A3%81%E7%9A%8414%E7%A5%AE%E5%84%AA%E8%B3%AA%E7%AB%B6%E7%88%AD%E5%8A%9B%20%E4%BD%95%E7%B6%93%E8%8F%AF"
+  },
+  {
+    "id": 45,
+    "filename": "IMG_6868.jpg",
+    "title": "怪老子教你理專不想告訴你的穩穩賺投資法",
+    "subtitle": "資產年回報10%的穩健投資哲學",
+    "author": "怪老子",
+    "publisher": "Smart智富",
+    "category": "生活實用",
+    "description": "知名理財部落客怪老子傳授 ETF 與債券資產配置算術，無懼市場波動實現資產複利增殖。",
+    "image": "processed_images/IMG_6868.jpg",
+    "url": "https://www.google.com/search?q=%E6%80%AA%E8%80%81%E5%AD%90%E6%95%99%E4%BD%A0%E7%90%86%E5%B0%88%E4%B8%8D%E6%83%B3%E5%91%8A%E8%A8%B4%E4%BD%A0%E7%9A%84%E7%A9%A9%E7%A9%A9%E8%B3%BA%E6%8A%95%E8%B3%87%E6%B3%95%20%E6%80%AA%E8%80%81%E5%AD%90"
+  },
+  {
+    "id": 46,
+    "filename": "IMG_6869.jpg",
+    "title": "全圖解技術分析 算價",
+    "subtitle": "多/空/都/賺 股票波段目標價推算術",
+    "author": "董鍾祥",
+    "publisher": "Smart智富",
+    "category": "商業理財",
+    "description": "技術分析名師董鍾祥圖解精算波段目標價與停損停利點，精準掌握多空買賣時機。",
+    "image": "processed_images/IMG_6869.jpg",
+    "url": "https://www.google.com/search?q=%E5%85%A8%E5%9C%96%E8%A7%A3%E6%8A%80%E8%A1%93%E5%88%86%E6%9E%90%20%E7%AE%97%E5%83%B9%20%E8%91%A3%E9%8D%BE%E7%A5%B6"
+  },
+  {
+    "id": 47,
+    "filename": "IMG_6870.jpg",
+    "title": "第五項修練",
+    "subtitle": "學習型組織的藝術與實務 (The Fifth Discipline)",
+    "author": "Peter M. Senge (彼得·聖吉)",
+    "publisher": "天下文化",
+    "category": "商業理財",
+    "description": "管理學大師彼得·聖吉不朽名著，闡述系統思考、自我超越、改善心智模式與建立共同願景。",
+    "image": "processed_images/IMG_6870.jpg",
+    "url": "https://www.google.com/search?q=%E7%AC%AC%E4%BA%94%E9%A0%85%E4%BF%AE%E7%B7%B4%20Peter%20M.%20Senge"
+  },
+  {
+    "id": 48,
+    "filename": "IMG_6871.jpg",
+    "title": "我愛故我在",
+    "subtitle": "陶晶瑩的愛情與人生感悟",
+    "author": "陶晶瑩",
+    "publisher": "圓神出版",
+    "category": "心理勵志",
+    "description": "知名主持人陶晶瑩誠摯分享感情酸甜苦辣與家庭生活，給予現代女性滿滿的愛與勇氣。",
+    "image": "processed_images/IMG_6871.jpg",
+    "url": "https://www.google.com/search?q=%E6%88%91%E6%84%9B%E6%95%85%E6%88%91%E5%9C%A8%20%E9%99%B6%E6%99%B6%E7%87%B6"
+  },
+  {
+    "id": 49,
+    "filename": "IMG_6872.jpg",
+    "title": "永遠在身邊",
+    "subtitle": "永遠のとなり",
+    "author": "白石一文",
+    "publisher": "時報出版",
+    "category": "文學故事",
+    "description": "日本直木賞名家白石一文感人小說，探討生命殘缺、陪伴與靈魂深處的永恆羈絆。",
+    "image": "processed_images/IMG_6872.jpg",
+    "url": "https://www.google.com/search?q=%E6%B0%B8%E9%81%A0%E5%9C%A8%E8%BA%AB%E9%82%8A%20%E7%99%BD%E7%9F%B3%E4%B8%80%E6%96%87"
+  },
+  {
+    "id": 50,
+    "filename": "IMG_6873.jpg",
+    "title": "錯過你，遇見愛！",
+    "subtitle": "說再見，是愛情的最大力量",
+    "author": "吳若權",
+    "publisher": "時報出版",
+    "category": "文學故事",
+    "description": "暢銷作家吳若權勵志情感散文，引導讀者走出失戀陰霾，勇敢告別過往迎向真正屬於自己的幸福。",
+    "image": "processed_images/IMG_6873.jpg",
+    "url": "https://www.google.com/search?q=%E9%8C%AF%E9%81%8E%E4%BD%A0%EF%BC%8C%E9%81%87%E8%A6%8B%E6%84%9B%EF%BC%81%20%E5%90%B3%E8%8B%A5%E6%AC%8A"
+  },
+  {
+    "id": 51,
+    "filename": "IMG_6874.jpg",
+    "title": "希臘·村上春樹·貓",
+    "subtitle": "A Good Month in Greece",
+    "author": "郭正佩",
+    "publisher": "華成出版",
+    "category": "生活實用",
+    "description": "融合影像與文字的愛琴海旅行圖文誌，循著村上春樹小說中的足跡，感受希臘小島的悠閒與寧靜。",
+    "image": "processed_images/IMG_6874.jpg",
+    "url": "https://www.google.com/search?q=%E5%B8%8C%E8%87%98%C2%B7%E6%9D%91%E4%B8%8A%E6%98%A5%E樹%C2%B7%E8%B2%93%20%E9%83%AD%E6%AD%A3%E4%BD%A9"
+  },
+  {
+    "id": 52,
+    "filename": "IMG_6875.jpg",
+    "title": "孔子這一班",
+    "subtitle": "古今皆通的國學智慧錦囊",
+    "author": "紀展雄、李觀發",
+    "publisher": "卓越文化",
+    "category": "童書繪本",
+    "description": "將論語故事活潑化，以輕鬆風趣的班級故事呈現孔子與弟子們的智慧問答。",
+    "image": "processed_images/IMG_6875.jpg",
+    "url": "https://www.google.com/search?q=%E5%AD%94%E5%AD%90%E9%80%99%E4%B8%80%E7%8F%AD%20%E7%B4%80%E5%B1%95%E9%9B%84%E3%80%81%E6%9D%8E%E8%A7%80%E7%99%BC"
+  },
+  {
+    "id": 53,
+    "filename": "IMG_6876.jpg",
+    "title": "五十音原來如此簡單！",
+    "subtitle": "無師自通的 4 大記憶法",
+    "author": "筒井直子",
+    "publisher": "捷徑文化",
+    "category": "工具書/字典",
+    "description": "日語初學者首選，圖像聯想與發音對照四大記憶法，3天輕鬆記住平假名與片假名。",
+    "image": "processed_images/IMG_6876.jpg",
+    "url": "https://www.google.com/search?q=%E4%BA%94%E5%8D%81%E9%9F%B3%E5%8E%9F%E4%BE%86%E5%A6%82%E6%AD%A4%E7%B0%A1%E5%96%AE%EF%BC%81%20%E7%AD%92%E4%BA%95%E7%9B%B4%E5%AD%90"
+  },
+  {
+    "id": 54,
+    "filename": "IMG_6877.jpg",
+    "title": "別告訴愛麗絲",
+    "subtitle": "Looking Glass Girl",
+    "author": "Cathy Cassidy (凱西·卡瑟迪)",
+    "publisher": "麥田出版",
+    "category": "文學故事",
+    "description": "英國青少年暢銷小說，改編自愛麗絲夢遊仙境意象，細膩刻畫同儕關係、友情與成長勇敢。",
+    "image": "processed_images/IMG_6877.jpg",
+    "url": "https://www.google.com/search?q=%E5%88%A5%E5%91%8A%E8%A8%B4%E6%84%9B%E9%BA%97%E7%B5%B2%20Cathy%20Cassidy"
+  },
+  {
+    "id": 55,
+    "filename": "IMG_6878.jpg",
+    "title": "喜羊羊與灰太狼 迷糊草",
+    "subtitle": "Pleasant Goat and Big Big Wolf",
+    "author": "黃偉明",
+    "publisher": "世一文化",
+    "category": "童書繪本",
+    "description": "風靡兩岸的喜羊羊卡通授權全彩繪本，青青草原上充滿歡笑與機智的幽默對決。",
+    "image": "processed_images/IMG_6878.jpg",
+    "url": "https://www.google.com/search?q=%E5%96%9C%E7%BE%8A%E7%BE%8A%E8%88%87%E7%81%B0%E5%A4%AA%E7%8B%BC%20%E8%BF%B7%E7%B3%8A%E8%8D%89%20%E9%BB%84%E5%81%89%E6%98%8E"
+  },
+  {
+    "id": 56,
+    "filename": "IMG_6879.jpg",
+    "title": "小呆指的願望",
+    "subtitle": "康軒校園繪本故事系列",
+    "author": "蕭逸清 (繪者: HOM的遊樂園)",
+    "publisher": "康軒文教事業",
+    "category": "童書繪本",
+    "description": "獲得知名兒童文學獎優良童書，透過溫馨可愛的故事引導孩子發現自我價值與優點。",
+    "image": "processed_images/IMG_6879.jpg",
+    "url": "https://www.google.com/search?q=%E5%B0%8F%E5%91%86%E6%8C%87%E7%9A%84%E9%A1%98%E6%9C%9B%20%E8%96%AE%E9%80%B8%E6%B8%85"
+  },
+  {
+    "id": 57,
+    "filename": "IMG_6880.jpg",
+    "title": "卡內基每日一智",
+    "subtitle": "人類智慧的寶庫與嘉言名句",
+    "author": "Dale Carnegie (戴爾·卡內基) / 主編: 黑幼龍",
+    "publisher": "龍齡出版",
+    "category": "心理勵志",
+    "description": "卡內基訓練經典思想結晶，每日一則勵志格言與心靈啟發，打造自信熱忱的成功人生。",
+    "image": "processed_images/IMG_6880.jpg",
+    "url": "https://www.google.com/search?q=%E5%8D%A1%E5%85%A7%E5%9F%BA%E6%AF%8F%E6%97%A5%E4%B8%80%E6%99%BA%20Dale%20Carnegie"
+  },
+  {
+    "id": 58,
+    "filename": "IMG_6881.jpg",
+    "title": "別鬧了，費曼先生",
+    "subtitle": "Surely You're Joking, Mr. Feynman!",
+    "author": "Richard P. Feynman (理查·費曼)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "諾貝爾物理學獎得主費曼自傳式自嘲故事，展示對萬物充滿好奇心、頑皮幽默又無畏追求真理的傳奇一生。",
+    "image": "processed_images/IMG_6881.jpg",
+    "url": "https://www.google.com/search?q=%E5%88%A5%E9%AC%B5%E4%BA%86%EF%BC%8C%E8%B2%BB%E6%9B%BC%E5%85%88%E7%94%9F%20Richard%20P.%20Feynman"
+  },
+  {
+    "id": 59,
+    "filename": "IMG_6882.jpg",
+    "title": "白雪公主救王子",
+    "subtitle": "顛覆童話 1 (Whatever After)",
+    "author": "Sarah Mlynowski (莎拉·梅林諾斯基)",
+    "publisher": "東雨文化",
+    "category": "童書繪本",
+    "description": "顛覆童話系列第一彈！兄妹倆誤入白雪公主的童話世界，一連串搞笑意外改寫了經典結局。",
+    "image": "processed_images/IMG_6882.jpg",
+    "url": "https://www.google.com/search?q=%E7%99%BD%E9%9B%AA%E5%85%AC%E4%B8%BB%E6%95%91%E7%8E%8B%E5%AD%90%20Sarah%20Mlynowski"
+  },
+  {
+    "id": 60,
+    "filename": "IMG_6883.jpg",
+    "title": "表弟的心事",
+    "subtitle": "品格教育故事系列——孝順與家庭責任",
+    "author": "毛咪 (繪者: GAGA)",
+    "publisher": "巧育文化",
+    "category": "童書繪本",
+    "description": "專為學齡兒童設計的品格教育繪本，故事溫馨感人，培養同理心與尊重親人的良好習慣。",
+    "image": "processed_images/IMG_6883.jpg",
+    "url": "https://www.google.com/search?q=%E8%A1%A8%E5%BC%9F%E7%9A%84%E5%BF%83%E4%BA%8B%20%E6%AF%9B%E5%92%AA"
+  },
+  {
+    "id": 61,
+    "filename": "IMG_6884.jpg",
+    "title": "回憶當舖",
+    "subtitle": "想い出あずかります",
+    "author": "吉野万理子",
+    "publisher": "悅知文化",
+    "category": "文學故事",
+    "description": "日本溫馨治癒系小說，在不可思議的回憶當舖裡，典當或典藏回憶背後的真情與淚水。",
+    "image": "processed_images/IMG_6884.jpg",
+    "url": "https://www.google.com/search?q=%E5%9B%9E%E6%86%B6%E7%95%B6%E8%88%96%20%E5%90%89%E9%87%8E%E4%B8%87%E7%90%86%E5%AD%90"
+  },
+  {
+    "id": 62,
+    "filename": "IMG_6885.jpg",
+    "title": "四季草花種植活用百科",
+    "subtitle": "買得到、種得活的花草園藝完全指南",
+    "author": "陳坤燦, 花草遊戲編輯部",
+    "publisher": "麥浩斯",
+    "category": "生活實用",
+    "description": "台灣園藝專家陳坤燦老師圖解示範，365天全年四季花草栽培照顧、播種與病蟲害防治全百科。",
+    "image": "processed_images/IMG_6885.jpg",
+    "url": "https://www.google.com/search?q=%E5%9B%9B%E5%AD%A3%E8%8D%89%E8%8A%B1%E7%A8%AE%E6%A4%8D%E6%B4%BB%E7%94%A8%E7%99%BE%E7%A7%91%20%E9%99%B3%E5%9D%A4%E7%87%9B"
+  },
+  {
+    "id": 63,
+    "filename": "IMG_6886.jpg",
+    "title": "偷書賊",
+    "subtitle": "The Book Thief",
+    "author": "Markus Zusak (馬克斯·蘇薩克)",
+    "publisher": "木馬文化",
+    "category": "文學故事",
+    "description": "全球狂銷千萬冊的感人小說，以「死神」為第一人稱敘事，述說二戰時期一位小女孩與文字力量的動人奇蹟。",
+    "image": "processed_images/IMG_6886.jpg",
+    "url": "https://www.google.com/search?q=%E5%81%B7%E6%9B%B8%E8%B3%8A%20Markus%20Zusak"
+  },
+  {
+    "id": 64,
+    "filename": "IMG_6887.jpg",
+    "title": "雷達英雄傳（下）",
+    "subtitle": "輻射八方改造世界 (The Invention That Changed the World)",
+    "author": "Robert Buderi (羅伯特·布德利)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "詳細記載二戰關鍵技術——雷達科技的誕生、戰場扭轉乾坤與戰後邁向微波爐、無線通訊與現代科技的演進。",
+    "image": "processed_images/IMG_6887.jpg",
+    "url": "https://www.google.com/search?q=%E9%9B%B7%E9%81%94%E8%8B%B1%E9%9B%84%E5%82%B3%EF%BC%88%E4%B8%8B%EF%BC%89%20Robert%20Buderi"
+  },
+  {
+    "id": 65,
+    "filename": "IMG_6888.jpg",
+    "title": "雷達英雄傳（上）",
+    "subtitle": "群英聚義麻省理工 (The Invention That Changed the World)",
+    "author": "Robert Buderi (羅伯特·布德利)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "講述 MIT 放射實驗室頂尖物理學家們祕密研發雷達技術、協助盟軍贏得空戰的史詩紀實。",
+    "image": "processed_images/IMG_6888.jpg",
+    "url": "https://www.google.com/search?q=%E9%9B%B7%E9%81%94%E8%8B%B1%E9%9B%84%E5%82%B3%EF%BC%88%E4%B8%8A%EF%BC%89%20Robert%20Buderi"
+  },
+  {
+    "id": 66,
+    "filename": "IMG_6889.jpg",
+    "title": "繽紛的生命",
+    "subtitle": "造訪基因庫的燦爛國度 (The Diversity of Life)",
+    "author": "Edward O. Wilson (愛德華·威爾森)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "社會生物學大師愛德華·威爾森經典之作，深入雨林與生態系，揭示生物多樣性對於地球文明的極致重要性。",
+    "image": "processed_images/IMG_6889.jpg",
+    "url": "https://www.google.com/search?q=%E7%B9%9B%E7%B4 me%E7%9A%84%E7%94%9F%E5%91%BD%20Edward%20O.%20Wilson"
+  },
+  {
+    "id": 67,
+    "filename": "IMG_6890.jpg",
+    "title": "玉米田裡的先知",
+    "subtitle": "異類遺傳學家麥克林托克 (A Feeling for the Organism)",
+    "author": "Evelyn Fox Keller (艾芙琳·福克斯·凱勒)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "諾貝爾醫學獎得主麥克林托克的傳奇傳記，記述她孤身研究發現「轉座基因」(跳躍基因) 翻轉遺傳學史的旅程。",
+    "image": "processed_images/IMG_6890.jpg",
+    "url": "https://www.google.com/search?q=%E7%8E%89%E7%B1%B3%E7%94%B0%E8%A3%A1%E7%9A%84%E5%85%88%E7%9F%A5%20Evelyn%20Fox%20Keller"
+  },
+  {
+    "id": 68,
+    "filename": "IMG_6891.jpg",
+    "title": "演化之舞",
+    "subtitle": "細菌主演的地球生命史 (Microcosmos)",
+    "author": "Lynn Margulis, Dorion Sagan (琳·瑪古利斯, 多里安·薩根)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "細胞內共生學說創始人瑪古利斯鋸作，細述微小的微生物與細菌如何形塑整個地球生氣蓬勃的演化舞台。",
+    "image": "processed_images/IMG_6891.jpg",
+    "url": "https://www.google.com/search?q=%E6%BC%94%E5%8C%96%E4%B9%8B%E8%88%9E%20Lynn%20Margulis"
+  },
+  {
+    "id": 69,
+    "filename": "IMG_6892.jpg",
+    "title": "矽晶之火",
+    "subtitle": "Crystal Fire: The Birth of the Information Age",
+    "author": "Michael Riordan, Lillian Hoddeson (麥可·里歐丹, 莉莉安·霍德森)",
+    "publisher": "天下文化",
+    "category": "科普知識",
+    "description": "記載半導體、電晶體與矽谷創生的科技革命巨著，再現貝爾實驗室天才科學家們締造資訊時代的火花。",
+    "image": "processed_images/IMG_6892.jpg",
+    "url": "https://www.google.com/search?q=%E7%9F%BD%E6%99%B6%E4%B9%8B%E7%81%AB%20Michael%20Riordan"
+  }
+];
+
+        let booksData = EMBEDDED_BOOKS_DATA;
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+
+        // DOM Elements
+        const gridEl = document.getElementById('books-grid');
+        const searchInput = document.getElementById('search-input');
+        const filtersEl = document.getElementById('category-filters');
+        const totalBadge = document.getElementById('total-badge');
+        const showingCountEl = document.getElementById('showing-count');
+        const activeFilterLabel = document.getElementById('active-filter-label');
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // Modal Elements
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalClose = document.getElementById('modal-close');
+        const modalImg = document.getElementById('modal-img');
+        const modalCategory = document.getElementById('modal-category');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubtitle = document.getElementById('modal-subtitle');
+        const modalAuthor = document.getElementById('modal-author');
+        const modalPublisher = document.getElementById('modal-publisher');
+        const modalFilename = document.getElementById('modal-filename');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalUrlBtn = document.getElementById('modal-url-btn');
+
+        // Initialize App
+        async function init() {
+            // Try fetching books_data.json if running on web server
+            try {
+                const res = await fetch('books_data.json');
+                if (res.ok) {
+                    const fetchedData = await res.json();
+                    if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+                        booksData = fetchedData;
+                    }
+                }
+            } catch (e) {
+                console.log("Loaded embedded books data.");
+            }
+
+            renderCategories();
+            renderGrid();
+            setupEventListeners();
+        }
+
+        // Render Category Filter Pills
+        function renderCategories() {
+            const rawCategories = booksData.map(b => b.category);
+            const uniqueCategories = ['全部', ...new Set(rawCategories)];
+
+            filtersEl.innerHTML = uniqueCategories.map((cat, idx) => `
+                <button class="filter-pill ${idx === 0 ? 'active' : ''}" data-category="${cat}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        // Render Books Grid
+        function renderGrid() {
+            const filtered = booksData.filter(book => {
+                const matchesCategory = (currentFilter === 'ALL' || currentFilter === '全部' || book.category.includes(currentFilter));
+                const q = searchQuery.toLowerCase();
+                const matchesSearch = !q || 
+                    book.title.toLowerCase().includes(q) ||
+                    (book.subtitle && book.subtitle.toLowerCase().includes(q)) ||
+                    book.author.toLowerCase().includes(q) ||
+                    book.publisher.toLowerCase().includes(q) ||
+                    book.category.toLowerCase().includes(q);
+
+                return matchesCategory && matchesSearch;
+            });
+
+            showingCountEl.textContent = `顯示 ${filtered.length} / ${booksData.length} 本圖書`;
+            totalBadge.textContent = `共 ${booksData.length} 本圖書`;
+
+            if (filtered.length === 0) {
+                gridEl.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <h3>找不到符合條件的圖書</h3>
+                        <p style="margin-top:0.5rem; font-size:0.9rem;">請嘗試調整關鍵字或切換至「全部」分類。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            gridEl.innerHTML = filtered.map(book => `
+                <div class="book-card" onclick="openModal(${book.id})">
+                    <div class="cover-container">
+                        <span class="category-tag">${escapeHtml(book.category.split('/')[0])}</span>
+                        <img src="${escapeHtml(book.image)}" alt="${escapeHtml(book.title)}" class="cover-image" loading="lazy" onerror="this.src='https://via.placeholder.com/280x360?text=Book+Cover'">
+                    </div>
+                    <div class="card-body">
+                        <span class="book-id-badge">#${String(book.id).padStart(2, '0')} · ${escapeHtml(book.filename)}</span>
+                        <h3 class="book-title" title="${escapeHtml(book.title)}">${escapeHtml(book.title)}</h3>
+                        ${book.subtitle ? `<div class="book-subtitle" title="${escapeHtml(book.subtitle)}">${escapeHtml(book.subtitle)}</div>` : '<div class="book-subtitle">&nbsp;</div>'}
+                        
+                        <div class="book-meta">
+                            <span>✍️ ${escapeHtml(book.author)}</span>
+                            <span>🏢 ${escapeHtml(book.publisher)}</span>
+                        </div>
+
+                        <p class="book-desc">${escapeHtml(book.description)}</p>
+
+                        <div class="card-actions">
+                            <button class="btn btn-outline" onclick="event.stopPropagation(); openModal(${book.id})">
+                                🔍 查看詳情
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open Modal
+        window.openModal = function(id) {
+            const book = booksData.find(b => b.id === id);
+            if (!book) return;
+
+            modalImg.src = book.image;
+            modalCategory.textContent = book.category;
+            modalTitle.textContent = book.title;
+            modalSubtitle.textContent = book.subtitle || '（無副標題）';
+            modalAuthor.textContent = book.author;
+            modalPublisher.textContent = book.publisher;
+            modalFilename.textContent = book.filename;
+            modalDesc.textContent = book.description;
+            modalUrlBtn.href = book.url;
+
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Close Modal
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Search Input
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderGrid();
+            });
+
+            // Category Filter Pills
+            filtersEl.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-pill')) {
+                    document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFilter = e.target.dataset.category;
+                    activeFilterLabel.textContent = `目前分類：${currentFilter}`;
+                    renderGrid();
+                }
+            });
+
+            // Theme Toggle
+            themeBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            });
+
+            // Modal Close Events
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        }
+
+        // Utility
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
